@@ -14,27 +14,47 @@ function bookAppointment() {
   const email = document.getElementById("email").value;
   const number = document.getElementById("number").value;
   const time = document.getElementById("time").value;
+
+  // Check if we are editing an existing appointment or creating a new one
+  const appointmentId = document.getElementById("appointmentId").value;
+
   if (name && email && number && time) {
     const appointmentData = {
       name: name,
       email: email,
       number: number,
-      time:time
+      time: time
     };
 
-    // Make a POST request to the CRUD CRUD API to store the appointment
-    axios.post('https://crudcrud.com/api/0f5dc5b7cf2845ff97f8c7bae46b2ae7/appointmentData', appointmentData)
-      .then(res => {
-        console.log(res.data);
+    if (appointmentId) {
+      // Editing an existing appointment
+      axios.put(`https://crudcrud.com/api/0f5dc5b7cf2845ff97f8c7bae46b2ae7/appointmentData/${appointmentId}`, appointmentData)
+        .then(res => {
+          console.log(res.data);
 
-        // Refresh the appointments list after booking
-        getAppointments();
-      })
-      .catch(err => console.error(err));
+          // Refresh the appointments list after editing
+          getAppointments();
+        })
+        .catch(err => console.error(err));
+    } else {
+      // Creating a new appointment
+      axios.post('https://crudcrud.com/api/0f5dc5b7cf2845ff97f8c7bae46b2ae7/appointmentData', appointmentData)
+        .then(res => {
+          console.log(res.data);
+
+          // Refresh the appointments list after booking
+          getAppointments();
+        })
+        .catch(err => console.error(err));
+    }
+
+    // Reset the form after submission
+    document.getElementById("form").reset();
   } else {
     alert('Please fill in all the details.');
   }
 }
+
 
 function getAppointments() {
   // Make a GET request to the CRUD CRUD API to retrieve appointments
@@ -67,7 +87,9 @@ function displayAppointments(appointments) {
           <p><strong>Date and Time:</strong> ${appointment.time}</p>
         </div>
         <div class="card-footer">
-          <button class="btn btn-danger float-md" onclick="deleteAppointment('${appointment._id}')">X</buttion>
+          <button class="btn btn-danger float-md" onclick="deleteAppointment('${appointment._id}')">Delete</buttion>
+          <i class="fas fa-trash-alt"></i>
+          <button class="btn btn-info float-end" onclick="editAppointment('${appointment._id}')">Edit</buttion>
           <i class="fas fa-trash-alt"></i>
         </div>
 
@@ -87,5 +109,29 @@ function displayAppointments(appointments) {
 
 
  }
+ function editAppointment(appointmentId) {
+  // Make a GET request to the CRUD CRUD API to retrieve the specific appointment details
+  axios.get(`https://crudcrud.com/api/0f5dc5b7cf2845ff97f8c7bae46b2ae7/appointmentData/${appointmentId}`)
+    .then(res => {
+      const appointmentDetails = res.data;
+
+      // Populate the main registration form with the appointment details
+      document.getElementById("name").value = appointmentDetails.name;
+      document.getElementById("email").value = appointmentDetails.email;
+      document.getElementById("number").value = appointmentDetails.number;
+      document.getElementById("time").value = appointmentDetails.time;
+
+      // Store the appointment ID for later use in the bookAppointment function
+      document.getElementById("appointmentId").value = appointmentId;
+
+      // Optional: Scroll to the top of the form for better user experience
+      document.getElementById("form").scrollIntoView({ behavior: "smooth" });
+    })
+    .catch(err => {
+      console.error(err);
+      // Handle the error here, e.g., show an alert to the user
+      alert('Error fetching appointment details. Please try again.');
+    });
+}
 
 getAppointments();

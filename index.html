@@ -24,6 +24,8 @@
           <br>
           <label for="number" class="form-label">Phone Number:</label>
           <input type="tel" id="number" class="form-control">
+          <label for="time" class="form-label">Time</label>
+          <input type="datetime-local" id="time" class="form-control">
           <br>
           <button onclick="bookAppointment()" class="btn btn-success">Book Appointment</button>
         </form>
@@ -32,7 +34,7 @@
   </div><br><hr>
 
   <div id="appointments" class="container">
-    <h2 style="text-align: center;">Appointments</h2>
+    <h2 style="text-align: center;">Appointments</h2><br>
     <div id="appointmentList"></div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
